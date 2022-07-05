@@ -1,12 +1,28 @@
+import { StyleSheet, Text, View, SafeAreaView  } from 'react-native';
+import { store } from './Redux/store';
+import { Provider } from 'react-redux'
+import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import colors from './resources/Style/Colors';
+
+// Components
+import PlaybackControls from './resources/Components/PlaybackControls';
+
+// Navigators
+import MainNavigation from './resources/Navigators/MainNavigation';
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <StatusBar style='light'/>
+      <SafeAreaView style={{flex: 0, backgroundColor: colors.bgHighlight}}/>
+      <SafeAreaView style={{flex: 1, backgroundColor: colors.bgPrimary}}>
+        <NavigationContainer>
+          <MainNavigation/>
+          <PlaybackControls/>
+        </NavigationContainer>
+      </SafeAreaView>
+    </Provider>
   );
 }
 
