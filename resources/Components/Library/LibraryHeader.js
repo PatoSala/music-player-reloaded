@@ -10,7 +10,7 @@ function LibraryHeader() {
                 <Text style={styles.title}>Library</Text>
 
                 <TouchableOpacity>
-                    <AntDesign name="plus" size={35} color={colors.appleMusicPink} />
+                    <AntDesign name="plus" size={27} color={colors.appleMusicPink} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
     title: {
         color: colors.textPrimary,
         fontWeight: 'bold',
-        fontSize: 34
+        fontSize: 27
     }
 })

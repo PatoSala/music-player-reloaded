@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, Image, TouchableOpacity, Text, StyleSheet, Button, Animated, AppState } from 'react-native';
+import { View, Image, TouchableOpacity, Text, StyleSheet, Button, Animated, AppState, ActivityIndicator } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons, Entypo, AntDesign } from '@expo/vector-icons';
 import { setCurrentSong } from '../../Redux/Slices/currentSongSlice';
 import { removeFirstFromQueue } from '../../Redux/Slices/queueSlice';
@@ -10,6 +10,7 @@ import colors from '../Style/Colors';
 
 // Components
 import SongTimer from './SongTimer';
+import CurrentSongModal from './CuerrentSongModal/CuerrentSongModal';
 
 function PlaybackControls() {
     
@@ -20,6 +21,7 @@ function PlaybackControls() {
 
     const [songDuration, setSongDuration] = useState(undefined);
     const [currentTime, setCurrentTime] = useState(undefined);
+    const [currentSongModal, setCurrentSongModal] = useState(false);
 
     useEffect(() => {
         if (currentSong != undefined) {
@@ -57,6 +59,7 @@ function PlaybackControls() {
     }
 
     const [playing, setPlaying] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onStateChange = useCallback((state) => {
         console.log(state);
@@ -66,6 +69,14 @@ function PlaybackControls() {
                 dispatch(setCurrentSong(queue[0].payload)),
                 dispatch(removeFirstFromQueue())
             ) : setPlaying(false);
+        }
+
+        if (state === 'buffering') {
+            setLoading(true);
+        }
+
+        if (state === 'playing' || state === 'paused') {
+            setLoading(false)
         }
 
     }, []);
@@ -82,10 +93,6 @@ function PlaybackControls() {
             console.log('Queue is empty!');
         }
     }
-
-
-
-
 
     return (
         currentSong !== undefined ? (
@@ -119,14 +126,22 @@ function PlaybackControls() {
                         </View>
 
                         <View style={styles.controls}>
-                            <TouchableOpacity 
-                                style={{width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent'}} 
-                                onPress={togglePlaying}
-                            >
-                                {
-                                    playing ? <Entypo name='controller-paus' size={30} color='white' /> : <Entypo name='controller-play' size={38} color='white' />
-                                }
-                            </TouchableOpacity>
+                            {
+                                loading ? (
+                                    <View style={{width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent'}}>
+                                        <ActivityIndicator size={'small'} color="white"/>
+                                    </View>
+                                ) : (
+                                    <TouchableOpacity 
+                                        style={{width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent'}} 
+                                        onPress={togglePlaying}
+                                    >
+                                        {
+                                            playing ? <Entypo name='controller-paus' size={30} color='white' /> : <Entypo name='controller-play' size={38} color='white' />
+                                        }
+                                    </TouchableOpacity>
+                                )
+                            }
 
                             <TouchableOpacity 
                                 style={{width: 30, height: 30, alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent'}}
@@ -138,9 +153,13 @@ function PlaybackControls() {
                         </View>
                     </View>
 
-                    <SongTimer songDuration={songDuration} currentTime={currentTime}/>
+                    <SongTimer playerRef={playerRef}/>
 
                 </LinearGradient>
+
+                {
+                    currentSongModal ? <CurrentSongModal/> : null
+                }
 
                 <YoutubePlayer
                     ref={playerRef}
